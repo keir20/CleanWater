@@ -1,74 +1,9 @@
-# Data analysis
-- Document here the project: CleanWater
-- Description: Project Description
-- Data Source:
-- Type of analysis:
+# Predicting Clean Water
 
-Please document the project the better you can.
+Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions.
 
-# Startup the project
+Therefore, our group has developed an algorithm to predict potable water. 
 
-The initial setup.
+![](/clean_water.jpg)
 
-Create virtualenv and install the project:
-```bash
-sudo apt-get install virtualenv python-pip python-dev
-deactivate; virtualenv ~/venv ; source ~/venv/bin/activate ;\
-    pip install pip -U; pip install -r requirements.txt
-```
-
-Unittest test:
-```bash
-make clean install test
-```
-
-Check for CleanWater in gitlab.com/{group}.
-If your project is not set please add it:
-
-- Create a new project on `gitlab.com/{group}/CleanWater`
-- Then populate it:
-
-```bash
-##   e.g. if group is "{group}" and project_name is "CleanWater"
-git remote add origin git@github.com:{group}/CleanWater.git
-git push -u origin master
-git push -u origin --tags
-```
-
-Functionnal test with a script:
-
-```bash
-cd
-mkdir tmp
-cd tmp
-CleanWater-run
-```
-
-# Install
-
-Go to `https://github.com/{group}/CleanWater` to see the project, manage issues,
-setup you ssh public key, ...
-
-Create a python3 virtualenv and activate it:
-
-```bash
-sudo apt-get install virtualenv python-pip python-dev
-deactivate; virtualenv -ppython3 ~/venv ; source ~/venv/bin/activate
-```
-
-Clone the project and install it:
-
-```bash
-git clone git@github.com:{group}/CleanWater.git
-cd CleanWater
-pip install -r requirements.txt
-make clean install test                # install and test
-```
-Functionnal test with a script:
-
-```bash
-cd
-mkdir tmp
-cd tmp
-CleanWater-run
-```
+-------------------------------------------
