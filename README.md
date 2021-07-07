@@ -21,7 +21,7 @@ Treating water yourself is also generally agreed to be more 'environmentally fri
 
 Our group has developed an algorithm to predict potable water. 
 
-![](/water_image.jpg)
+![](/clean_water_for_travellers.jpg)
 
 -------------------------------------------
 Source: fitfortravel.nhs.uk
