@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 # from data import 
 from imblearn.under_sampling import InstanceHardnessThreshold
-hello
+
 class DataPrep(data):
     
     def __init__(self, data):
