@@ -25,4 +25,5 @@ Our group has developed an algorithm to predict potable water.
 
 -------------------------------------------
 Photo by <a href="https://unsplash.com/@katejoie?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Kate Joie</a> on <a href="https://unsplash.com/s/photos/clean-water?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+
 Source: fitfortravel.nhs.uk
