@@ -16,8 +16,10 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
+from imblearn.under_sampling import InstanceHardnessThreshold
 
 # mlflow
+import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
 from memoized_property import memoized_property
@@ -85,6 +87,7 @@ class Trainer(object):
         
         pipe_ph_features = Pipeline([
             ('ph', SimpleImputer(strategy='mean')),
+            ('ph', InstanceHardnessThreshold()),
             ('ph_scaler', StandardScaler())])
         
         pipe_hardness_features = Pipeline([
