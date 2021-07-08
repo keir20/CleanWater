@@ -17,6 +17,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import InstanceHardnessThreshold
+from sklearn.metrics import mean_squared_error
 
 # mlflow
 import joblib
@@ -87,39 +88,47 @@ class Trainer(object):
         
         pipe_ph_features = Pipeline([
             ('ph', SimpleImputer(strategy='mean')),
-            ('ph', InstanceHardnessThreshold()),
+            # ('ph_sampler', InstanceHardnessThreshold()),
             ('ph_scaler', StandardScaler())])
         
         pipe_hardness_features = Pipeline([
             ('hardness', SimpleImputer(strategy='mean')),
+            # ('hardness_sampler', InstanceHardnessThreshold()),
             ('hardness_scaler', StandardScaler())])
         
         pipe_solids_features = Pipeline([
             ('solids', SimpleImputer(strategy='mean')),
+            # ('solids_sampler', InstanceHardnessThreshold()),
             ('solids_scaler', StandardScaler())])
         
         pipe_chloramines_features = Pipeline([
             ('chloramines', SimpleImputer(strategy='mean')),
+            # ('chloramines_sampler', InstanceHardnessThreshold()),
             ('chloramines_scaler', StandardScaler())])
         
         pipe_sulfate_features = Pipeline([
             ('sulfate', SimpleImputer(strategy='mean')),
+            # ('sulfate_sampler', InstanceHardnessThreshold()),
             ('sulfate_scaler', StandardScaler())])
         
         pipe_conductivity_features = Pipeline([
             ('conductivity', SimpleImputer(strategy='mean')),
+            # ('conductivity_sampler', InstanceHardnessThreshold()),
             ('conductivity_scaler', StandardScaler())])
         
         pipe_carbon_features = Pipeline([
             ('carbon', SimpleImputer(strategy='mean')),
+            # ('carbon_sampler', InstanceHardnessThreshold()),
             ('carbon_scaler', StandardScaler())])
         
         pipe_trihalomethanes_features = Pipeline([
             ('trihalomethanes', SimpleImputer(strategy='mean')),
+            # ('trihalomethanes_sampler', InstanceHardnessThreshold()),
             ('trihalomethanes_scaler', StandardScaler())])
         
         pipe_turbidity_features = Pipeline([
             ('turbidity', SimpleImputer(strategy='mean')),
+            # ('turbidity_sampler', InstanceHardnessThreshold()),
             ('turbidity_scaler', StandardScaler())])
     
     
@@ -157,20 +166,20 @@ class Trainer(object):
         self.pipeline.fit(self.X, self.y)
         print('pipeline fitted')
         
-    # def evaluate(self, X_test, y_test):
-    #     """ evaluates the pipeline on X and return the accuracy """
-    #     y_pred_train = self.pipeline.predict(self.X)
-    #     mse_train = mean_squared_error(self.y, y_pred_train)
-    #     rmse_train = np.sqrt(mse_train)
+    def evaluate(self, X_test, y_test):
+        """ evaluates the pipeline on X and return the accuracy """
+        y_pred_train = self.pipeline.predict(self.X)
+        mse_train = mean_squared_error(self.y, y_pred_train)
+        rmse_train = np.sqrt(mse_train)
     
-    #     self.mlflow_log_metric('rmse_train', rmse_train)
+        self.mlflow_log_metric('rmse_train', rmse_train)
         
-    #     y_pred_test = self.pipeline.predict(X_test)
-    #     mse_test = mean_squared_error(y_test, y_pred_test)
-    #     rmse_test = np.sqrt(mse_test)
-    #     self.mlflow_log_metric('rmse_test', rmse_test)
+        y_pred_test = self.pipeline.predict(X_test)
+        mse_test = mean_squared_error(y_test, y_pred_test)
+        rmse_test = np.sqrt(mse_test)
+        self.mlflow_log_metric('rmse_test', rmse_test)
         
-    #     return (round(rmse_train, 3) ,round(rmse_test, 3))
+        return (round(rmse_train, 3) ,round(rmse_test, 3))
         
     def predict(self, X):
         y_pred = self.pipeline.predict(X)
@@ -221,7 +230,7 @@ if __name__ == "__main__":
     
     # hold out
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    
+
     # train model
     estimators = ['Linear_Regression', 'GBC'] 
 
