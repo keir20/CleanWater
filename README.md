@@ -11,9 +11,9 @@ When you are travelling, you should take safe food and water precautions to avoi
 
 You should only use water for drinking, making ice cubes or cleaning teeth if it has been:
 
-    - Bottled or canned by a known manufacturer and the seal is intact
-    - Boiled and cooled and stored in a clean container
-    - Chemically disinfected or passed through a reliable water filter and stored in a clean container
+    - Bottled or canned by a known manufacturer and the seal is intact.
+    - Boiled and cooled and stored in a clean container.
+    - Chemically disinfected or passed through a reliable water filter and stored in a clean container.
 
 Even where bottled water is readily available, it is a good idea to have a backup system for making water safe in case you run out of bottled water.
 
