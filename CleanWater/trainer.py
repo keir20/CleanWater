@@ -8,7 +8,9 @@ from CleanWater.params import MLFLOW_URI, EXPERIMENT_NAME
 
 # machine learning models
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 # pipeline
 from sklearn.model_selection import train_test_split
@@ -53,8 +55,23 @@ class Trainer(object):
         if estimator == 'Logistic_Regression':
             model = LogisticRegression()
             self.model_params = {'C': [0.01, 0.1, 1, 10, 100],
-                                 'max_iter': [1, 10, 25, 50, 100, 200],
+                                 'penalty': ['l1', 'l2'],
+                                 'solver': ['newton-cg', 'lbfgs', 'sag', 'saga'],
+                                 'max_iter': [100, 500, 1000, 2000, 3000, 4000],
                                  'tol': [0.0001, 0.001, 0.01]}
+        
+        elif estimator == 'KNN':
+            model = KNeighborsClassifier()
+            self.model_params = {'n_neighbors': [3, 5, 7, 10, 15],
+                                 'weights': ['uniform', 'distance'],
+                                 'algorithm': ['auto', 'ball_tree', 'kd_tree']}
+        
+        elif estimator == 'RFC':
+            model = RandomForestClassifier()
+            self.model_params = {'n_estimators': [100, 200, 500, 1000],
+                                 'criterion': ['gini', 'entropy'],
+                                 'max_depth': [2, 3, 5, 10],
+                                 'min_samples_split': [2, 3, 5, 10, 15]}
         
         elif estimator == 'GBC':
             model = GradientBoostingClassifier()
@@ -229,10 +246,10 @@ if __name__ == "__main__":
             'Conductivity', 'Organic_carbon','Trihalomethanes', 'Turbidity']]
     
     # hold out
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     # train model
-    estimators = ['Linear_Regression', 'GBC'] 
+    estimators = ['Linear_Regression', 'KNN', 'RFC', 'GBC'] 
 
     for estimator in estimators:
         params = {'estimator': estimator,
