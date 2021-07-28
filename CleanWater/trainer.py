@@ -81,6 +81,16 @@ class Trainer(object):
                                  'validation_fraction': [0.01, 0.1, 1, 5, 7, 10],
                                  'tol': [1, 5, 10, 15, 20],
                                  'subsample': [0.01, 0.1, 0.17, 0.5, 1, 5, 10]}
+        
+        elif estimator == 'KEIR_GBC':
+            model = GradientBoostingClassifier()
+            self.model_params = {'learning_rate': (np.linspace(0.01,1)),
+                                'n_estimators': (np.linspace(800,1300, dtype='int')),
+                                'max_depth': (1, 5, 10),
+                                'validation_fraction': (np.linspace(0.01,10)),
+                                'tol': (0.0001, 10),
+                                'subsample': (np.linspace(0.17,1))
+                                }
             
         else:
             model = LogisticRegression()
