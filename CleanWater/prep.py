@@ -3,24 +3,23 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-
-# from data import 
+#from data import 
 from imblearn.under_sampling import InstanceHardnessThreshold
 
-class DataPrep(data):
+class DataPrep():
     
     def __init__(self, data):
         self.data = data
         
-    def split(self, data):
-        X = data.drop(columns=['Potability'])
-        y = data['Potability']    
+    def split(self):
+        X = self.data.drop(columns=['Potability'])
+        y = self.data['Potability']    
         return X, y
     
-    def data_transform(self, data):    
+    def data_transform(self):    
         new_data_frame = pd.DataFrame()
-        for column in data:
-            new_data_frame[column] = data[column].fillna(data.groupby(['Potability'])[column].transform('mean'))
+        for column in self.data:
+            new_data_frame[column] = self.data[column].fillna(self.data.groupby(['Potability'])[column].transform('mean'))
         return new_data_frame
     
     def sampling(self, X, y):
@@ -31,6 +30,6 @@ class DataPrep(data):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size, random_state)
         return X_train, X_test, y_train, y_test
     
-    def scale(self, data):
-        scale = StandardScaler().fit_transform(data)
+    def scale(self):
+        scale = StandardScaler().fit_transform(self.data)
         return scale
