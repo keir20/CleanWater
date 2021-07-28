@@ -1,7 +1,7 @@
 # data analysis and wrangling
 import numpy as np 
 import pandas as pd
-
+from prep import DataPrep
 # data source
 from CleanWater.data import load_data
 from CleanWater.params import MLFLOW_URI, EXPERIMENT_NAME
@@ -19,7 +19,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import InstanceHardnessThreshold
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, classification_report
 
 # mlflow
 import joblib
@@ -104,49 +104,58 @@ class Trainer(object):
                                                     'Trihalomethanes', 'Turbidity'])
         
         pipe_ph_features = Pipeline([
-            ('ph', SimpleImputer(strategy='mean')),
+            #('ph', SimpleImputer(strategy='mean')),
             # ('ph_sampler', InstanceHardnessThreshold()),
-            ('ph_scaler', StandardScaler())])
+            ('ph_scaler', StandardScaler())
+            ])
         
         pipe_hardness_features = Pipeline([
-            ('hardness', SimpleImputer(strategy='mean')),
+            #('hardness', SimpleImputer(strategy='mean')),
             # ('hardness_sampler', InstanceHardnessThreshold()),
-            ('hardness_scaler', StandardScaler())])
+            ('hardness_scaler', StandardScaler())
+            ])
         
         pipe_solids_features = Pipeline([
-            ('solids', SimpleImputer(strategy='mean')),
+            #('solids', SimpleImputer(strategy='mean')),
             # ('solids_sampler', InstanceHardnessThreshold()),
-            ('solids_scaler', StandardScaler())])
+            ('solids_scaler', StandardScaler())
+            ])
         
         pipe_chloramines_features = Pipeline([
-            ('chloramines', SimpleImputer(strategy='mean')),
+            #('chloramines', SimpleImputer(strategy='mean')),
             # ('chloramines_sampler', InstanceHardnessThreshold()),
-            ('chloramines_scaler', StandardScaler())])
+            ('chloramines_scaler', StandardScaler())
+            ])
         
         pipe_sulfate_features = Pipeline([
-            ('sulfate', SimpleImputer(strategy='mean')),
+            #('sulfate', SimpleImputer(strategy='mean')),
             # ('sulfate_sampler', InstanceHardnessThreshold()),
-            ('sulfate_scaler', StandardScaler())])
+            ('sulfate_scaler', StandardScaler())
+            ])
         
         pipe_conductivity_features = Pipeline([
-            ('conductivity', SimpleImputer(strategy='mean')),
+            #('conductivity', SimpleImputer(strategy='mean')),
             # ('conductivity_sampler', InstanceHardnessThreshold()),
-            ('conductivity_scaler', StandardScaler())])
+            ('conductivity_scaler', StandardScaler())
+            ])
         
         pipe_carbon_features = Pipeline([
-            ('carbon', SimpleImputer(strategy='mean')),
+            #('carbon', SimpleImputer(strategy='mean')),
             # ('carbon_sampler', InstanceHardnessThreshold()),
-            ('carbon_scaler', StandardScaler())])
+            ('carbon_scaler', StandardScaler())
+            ])
         
         pipe_trihalomethanes_features = Pipeline([
-            ('trihalomethanes', SimpleImputer(strategy='mean')),
+            #('trihalomethanes', SimpleImputer(strategy='mean')),
             # ('trihalomethanes_sampler', InstanceHardnessThreshold()),
-            ('trihalomethanes_scaler', StandardScaler())])
+            ('trihalomethanes_scaler', StandardScaler())
+            ])
         
         pipe_turbidity_features = Pipeline([
-            ('turbidity', SimpleImputer(strategy='mean')),
+            #('turbidity', SimpleImputer(strategy='mean')),
             # ('turbidity_sampler', InstanceHardnessThreshold()),
-            ('turbidity_scaler', StandardScaler())])
+            ('turbidity_scaler', StandardScaler())
+            ])
     
     
     # define default feature engineering blocks
@@ -173,10 +182,19 @@ class Trainer(object):
         self.pipeline = Pipeline(steps=[
             ('features', features_encoder),
             ('rgs', self.get_estimator())])
+    
+    def balance_data(self):
+        InstanceHardnessThreshold(random_state=42).fit_resample(self.X, self.y)
+        return self.X, self.y
 
 ###--------------------------------------
 
 # Run pipeline
+    def new_run(self):
+        self.set_pipeline()
+        self.pipeline.fit(self.X, self.y)
+        return self.balance_data()
+
     def run(self):
         self.set_pipeline()
         self.mlflow_log_param('model', 'Classification')
@@ -197,6 +215,17 @@ class Trainer(object):
         self.mlflow_log_metric('rmse_test', rmse_test)
         
         return (round(rmse_train, 3) ,round(rmse_test, 3))
+    
+    ################
+    # new evaluation to check different metrics
+    ################
+    
+    def evaluate_keir(self, X_test, y_test):
+        y_pred_train = self.pipeline.predict(self.X)
+        print(classification_report(self.y, y_pred_train))
+        y_pred_test = self.pipeline.predict(X_test)
+        print(classification_report(y_test, y_pred_test))
+
         
     def predict(self, X):
         y_pred = self.pipeline.predict(X)
@@ -239,17 +268,32 @@ if __name__ == "__main__":
     # store the data in a DataFrame
     N = 2000
     df = load_data(N)
+    
+    ########################
+    # Takes in X and y of the whole dataset so that it can balance.
+    # The issue with the InstanceHardnessThreshold is that there can't be any NaN values and until the pipeline has been fitted, this can't be possible.
+    # I thought about putting in the pipeline first, then the IHT but this would be data leakage as you have to input X and y to the IHT.
+    # The only solution that I can think of, is to apply the inputer seperately so all the values are filled. 
+    # Then use the IHT to split the data back into the balanced X, y. 
+    # Then scale it. (I've jsut kept it in the pipeline for this step. Overkill?? Probably)
+    ########################
+    
+    # clean the data
+    cleaning_data = DataPrep(df)
+    df = cleaning_data.data_transform()
         
     # set X and y
     y = df['Potability']
     X = df[['ph', 'Hardness', 'Solids', 'Chloramines','Sulfate', 
             'Conductivity', 'Organic_carbon','Trihalomethanes', 'Turbidity']]
-    
+
+    X_instance, y_instance = cleaning_data.sampling(X, y)
+        
     # hold out
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X_instance, y_instance, test_size=0.2)
 
     # train model
-    estimators = ['Linear_Regression', 'KNN', 'RFC', 'GBC'] 
+    estimators = ['Linear_Regression', 'KNN', 'RFC', 'GBC', 'KEIR_GBC'] 
 
     for estimator in estimators:
         params = {'estimator': estimator,
@@ -258,13 +302,15 @@ if __name__ == "__main__":
                               'conductivity', 'carbon', 
                               'trihalomethanes', 'turbidity']}
         
+        
         trainer = Trainer(X_train, y_train, **params)
         trainer.set_experiment_name(EXPERIMENT_NAME)
         trainer.run()
     
         # evaluate the pipeline
-        accuracy = trainer.evaluate(X_test, y_test)
-        print(f"accuracy: {accuracy}")
+        accuracy = trainer.evaluate_keir(X_test, y_test)
+        print(accuracy)
+        #print(f"accuracy: {accuracy}")
         
         # save model locally
         trainer.save_model()
