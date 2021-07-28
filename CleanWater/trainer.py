@@ -81,16 +81,6 @@ class Trainer(object):
                                  'validation_fraction': [0.01, 0.1, 1, 5, 7, 10],
                                  'tol': [1, 5, 10, 15, 20],
                                  'subsample': [0.01, 0.1, 0.17, 0.5, 1, 5, 10]}
-        
-        elif estimator == 'KEIR_GBC':
-            model = GradientBoostingClassifier()
-            self.model_params = {'learning_rate': (np.linspace(0.01,1)),
-                                'n_estimators': (np.linspace(800,1300, dtype='int')),
-                                'max_depth': (1, 5, 10),
-                                'validation_fraction': (np.linspace(0.01,10)),
-                                'tol': (0.0001, 10),
-                                'subsample': (np.linspace(0.17,1))
-                                }
             
         else:
             model = LogisticRegression()
@@ -226,12 +216,15 @@ class Trainer(object):
         
         return (round(rmse_train, 3) ,round(rmse_test, 3))
     
+    ################
     # new evaluation to check different metrics
+    ################
+    
     def evaluate_keir(self, X_test, y_test):
-        #y_pred_train = self.pipeline.predict(self.X)
-        
+        y_pred_train = self.pipeline.predict(self.X)
+        print(classification_report(self.y, y_pred_train))
         y_pred_test = self.pipeline.predict(X_test)
-        return classification_report(y_test, y_pred_test)
+        print(classification_report(y_test, y_pred_test))
 
         
     def predict(self, X):
@@ -276,6 +269,15 @@ if __name__ == "__main__":
     N = 2000
     df = load_data(N)
     
+    ########################
+    # Takes in X and y of the whole dataset so that it can balance.
+    # The issue with the InstanceHardnessThreshold is that there can't be any NaN values and until the pipeline has been fitted, this can't be possible.
+    # I thought about putting in the pipeline first, then the IHT but this would be data leakage as you have to input X and y to the IHT.
+    # The only solution that I can think of, is to apply the inputer seperately so all the values are filled. 
+    # Then use the IHT to split the data back into the balanced X, y. 
+    # Then scale it. (I've jsut kept it in the pipeline for this step. Overkill?? Probably)
+    ########################
+    
     # clean the data
     cleaning_data = DataPrep(df)
     df = cleaning_data.data_transform()
@@ -284,15 +286,6 @@ if __name__ == "__main__":
     y = df['Potability']
     X = df[['ph', 'Hardness', 'Solids', 'Chloramines','Sulfate', 
             'Conductivity', 'Organic_carbon','Trihalomethanes', 'Turbidity']]
-    
-    ########################
-    # Takes in X and y of the whole dataset so that it can balance.
-    # The issue with the InstanceHardnessThreshold is that there can't be any NaN values and until the pipeline has been fitted, this can't be possible.
-    # I thought about putting in the pipeline first, then the IHT but this would be data leakage as you have to input X and y to the IHT.
-    # The only solution that I can think of, is to apply the inputer seperately so all the values are filled. 
-    # Then use the IHT to split the data back into the balanced X, y. 
-    # Then scale it. 
-    ########################
 
     X_instance, y_instance = cleaning_data.sampling(X, y)
         
@@ -300,7 +293,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(X_instance, y_instance, test_size=0.2)
 
     # train model
-    estimators = ['Linear_Regression', 'KNN', 'RFC', 'GBC'] 
+    estimators = ['Linear_Regression', 'KNN', 'RFC', 'GBC', 'KEIR_GBC'] 
 
     for estimator in estimators:
         params = {'estimator': estimator,
